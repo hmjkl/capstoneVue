@@ -1,0 +1,74 @@
+
+:root {
+  --blue:    #0d6efd;
+  --indigo:  #6610f2;
+  --purple:  #6f42c1;
+  --pink:    #d63384;
+  --red:     #dc3545;
+  --orange:  #fd7e14;
+  --yellow:  #ffc107;
+  --green:   #198754;
+  --teal:    #20c997;
+  --cyan:    #0dcaf0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.lr-container {
+  margin: 0;
+  display: flex;
+}
+
+.box-link {
+  background-color: var(--green);
+  color: #ffffff;
+  margin-top: 5px;
+  margin-left: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  width: 100%;
+}
+
+#well-pair-list option {
+  padding-left: 50px;
+  padding-right: 50px;
+  text-align: center;
+}
+
+.lr-container > div:first-of-type {
+  margin-left: auto;
+  min-width: 150px;
+  margin-right: 20px;
+}
+
+.lr-container > div:last-of-type{
+  min-width: 1200px;
+  margin-right: auto;
+}
+
+#well-pair-list {
+  height: 500px;
+  min-width: 100px;
+}
+
+.inline-selector {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.view-container {
+  display: flex;
+  align-content: center;
+}
+
+.view-container .left {
+  flex-basis: 80%;
+}
+
+.view-container .right {
+  margin-top: 90px;
+}
+
+.plot {
+  width: auto;
+  height: 500px;
+}

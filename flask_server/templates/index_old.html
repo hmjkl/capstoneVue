@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdn.plot.ly/plotly-2.9.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/natsort@latest/index.min.js"></script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENEL 500 Test Site</title>
+
+</head>
+
+<body onload="init();">
+
+    <div id="content">
+        <select id='well-pair-list' onchange="selectedWellChanged(this)" multiple>
+            <option>test</option>
+        </select>
+
+        <div id='center-view'>
+            <div class='view-container'>
+                <div class='left'>
+                	<p>Production History</p>
+                    <div class='plot' id='prim-plot'></div>
+                    <div class='inline-selector'>
+                        <p>Prediction start date: <input type='date' id='start-date'></input></p>
+                        <p>Prediction end date: <input type='date' id='end-date'></input></p>
+                    </div>
+                    <p>Predicted Output</p>
+                    <div class='plot' id='pred-plot'></div>
+                </div>
+
+                <div class='right action-selector'>
+                    <button class='box-link' onclick="getPrediction()">Predict</button>
+                    <button class='box-link'>Optimize</button>
+                </div>
+
+            </div>
+        </div>
+
+        <script>
+            // @FIXME: remove global vars
+            var state = null
+            var selectedWell = null
+
+            function selectedWellChanged(selectedObj) {
+                selectedWell = selectedObj.value
+                //updatePlot(selectedWell)
+                updateMainPlot(selectedWell)
+                setDateLimits(selectedWell)
+            }
+
+            function getPrediction() {
+                var dataPackage = {
+                    startDate: document.getElementById('start-date').value,
+                    endDate: document.getElementById('end-date').value,
+                    data: state.data[selectedWell]
+                }
+                console.log(dataPackage)
+
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", '/api/predict', true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var json = JSON.parse(xhr.responseText);
+
+                        var expectedOilProd = {
+                            x: json.date,
+                            y: json.data,
+                            type: 'scatter',
+                            name: 'Predicted Oil Production (m3)'
+                        }
+
+                        console.log(expectedOilProd)
+
+                        var layout = {
+                            title: { text: 'Expected well oil production' },
+                            xaxis: { title: { text: 'Date' } },
+                            yaxis: { title: { text: 'Production' } }
+                        }
+
+                        Plotly.newPlot('pred-plot', [expectedOilProd], layout)
+                    }
+                };
+                var data = JSON.stringify(dataPackage);
+                xhr.send(data);
+
+            }
+
+            function setDateLimits(selectedWell) {
+                var dates = state.data[selectedWell].date
+                var maxPredictionStartDate = dates[dates.length - 1]
+                var minPredictionsStartDate = dates[0]
+                // @FIXME: make more robust
+                document.querySelectorAll('[type=date]').forEach(
+                    function f(obj) {
+                        //obj.setAttribute('max', maxPredictionStartDate)
+                        obj.setAttribute('min', minPredictionsStartDate)
+                    }
+                
+                )
+				//document.getElementById('start-date').setAttribute('max', maxPredictionStartDate)
+            }
+
+            function getPlotTraces(selectedWell) {
+                var oilProdPlot = {
+                    x: state.data[selectedWell].date,
+                    y: state.data[selectedWell].oilProd,
+                    type: 'scatter',
+                    name: 'Oil Production (m3)'
+                }
+
+
+                var steamInjPlot = {
+                    x: state.data[selectedWell].date,
+                    y: state.data[selectedWell].steamInj,
+                    type: 'scatter',
+                    name: 'Steam Injection (m3)'
+                }
+                return [oilProdPlot, steamInjPlot]
+            }
+
+            function updateMainPlot(selectedWell) {
+
+                traces = getPlotTraces(selectedWell)
+
+                var layout = {
+                    title: { text: 'Well Pair Production' },
+                    xaxis: { title: { text: 'Date' } },
+                    yaxis: { title: { text: 'Production' } }
+                }
+
+                Plotly.newPlot('prim-plot', traces, layout)
+            }
+
+            // @FIXME: use natural sort, fix hacks
+            function setDropDownOptions(list, id) {
+                var sel = document.getElementById(id)
+                sel.innerText = ''
+                var natsortList = list.sort(natsort())
+                for (var i = 0; i < natsortList.length; i++) {
+                    var option = document.createElement("option")
+                    option.setAttribute("value", natsortList[i]);
+                    option.text = natsortList[i];
+                    sel.appendChild(option);
+                }
+            }
+
+            // @FIXME: use async get request
+            function httpGet(url) {
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open("GET", url, false);
+                xmlHttp.send(null);
+                return xmlHttp.responseText;
+            }
+
+            function init() {
+                state = JSON.parse(httpGet('/api/proddata'))
+                console.log(state.data)
+                setDropDownOptions(state.wellNames, 'well-pair-list')
+                document.getElementById('well-pair-list').value = state.wellNames[0]
+                document.getElementById('well-pair-list').onchange()
+            }
+        </script>
+    </div>
+</body>
+
+</html>
