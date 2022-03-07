@@ -3,7 +3,7 @@
 ## Hot-reloding front-end
 
 ```sh
-npm run lint
+npm run dev
 ```
 
 ## Flask backend
