@@ -36,73 +36,10 @@ export default {
     //console.log(this.modelInfo);
   }
 }
-//export default {
-//  data() {
-//    return {
-//      wellList: null,
-//      selectedOption: null,
-//      wellData: null,
-//    };
-//  },
-//  watch: {
-//    selectedOption: "redrawPlot",
-//  },
-//  methods: {
-//    processUpdate(data) {
-//      console.log(data);
-//      this.wellData = data.data;
-//      this.wellList = data.wellNames;
-//    },
-//    async fetchData() {
-//      const url = "http://localhost:5000/api/proddata"; // @FIXME
-//      fetch(url)
-//        .then((resp) => resp.json())
-//        .then((data) => this.processUpdate(data));
-//    },
-//    redrawPlot() {
-//      if (this.selectedOption.length != 1) {
-//        console.error("no well selected.");
-//        return;
-//      }
-//      var selTmp = this.wellData[this.selectedOption];
-//      var oilProdPlot = {
-//        x: selTmp.date,
-//        y: selTmp.oilProd,
-//        type: "scatter",
-//        name: "Oil Production (m3)",
-//      };
-//      var steamInjPlot = {
-//        x: selTmp.date,
-//        y: selTmp.steamInj,
-//        type: "scatter",
-//        name: "Steam Injection (m3)",
-//      };
-//      Plotly.newPlot("main-plot", [oilProdPlot, steamInjPlot]);
-//    },
-//  },
-//  created() {
-//    //this.fetchData();
-//  },
-//  components: { FileUploadBox },
-//};
+
 </script>
 
 <template>
   <UploadPage v-on:well-data-update="refreshWellData" />
   <Predict :wells="wellList" :wellData="wellData" :modelInfo="modelInfo"/>
 </template>
-
-<!--
-<style>
-.content {
-  display: flex;
-}
-
-.left {
-}
-
-.right {
-}
-
-</style>
--->
