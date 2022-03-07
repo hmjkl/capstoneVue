@@ -5,8 +5,18 @@ export default {
     props: {
         plot: Object
     },
+    methods: {
+        drawPlot() {
+            Plotly.newPlot(this.$refs.plotdiv, this.plot.traces, this.plot.layout)
+        }
+    },
     mounted() {
-        Plotly.newPlot(this.$refs.plotdiv, this.plot.traces, this.plot.layout)
+        this.drawPlot()
+    },
+    watch: {
+        plot() {
+            this.drawPlot();
+        }
     }
 
 }
